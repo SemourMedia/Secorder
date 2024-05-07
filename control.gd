@@ -5,112 +5,129 @@ extends Control
 var time_begin
 var time_delay
 var effect
-var recording
-var state
-var runTimeDict
-var curTimeDict
-var current_playtime
+var recording 
+var state # RECORDING, STOPPED, PLAYING
+var run_time_dictionary: Dictionary # 1:55  = MIN = 1, SEC = 55
+var current_time_dictionary:Dictionary # 1:55  = MIN = 1, SEC = 55
+var current_playtime: float # in seconds float
 
-# IMPORTS
-"""
-$AudioStreamPlayer
-$AudioStreamInstrumental
-$RunTimeLabel
-$CurTimeLabel
-$PlayButton
-$RecordButton
-"""
+# # # # # # # IMPORTS # # # # # # # #
 
 # AUDIO STREAM PLAYERS
+@onready var asp_record = $Audio/ASP_Record
+@onready var asp_vocal = $Audio/ASP_Vocal
+@onready var asp_instrumental = $Audio/ASP_Instrumental
+@onready var asp_mixdown = $Audio/ASP_Mixdown
 
-var Vocal
-var Instrumental
-var Mixdown
+# LABELS
+@onready var label_state = $Labels/Label_State
+@onready var label_run_time = $Labels/Label_RunTime
+@onready var label_current_time = $Labels/Label_CurrentTime
+
+# SLIDERS
+@onready var slider_instrumental = $Sliders/Slider_Instrumental
+@onready var slider_vocals = $Sliders/Slider_Vocals
+@onready var slider_mixdown = $Sliders/Slider_Mixdown
+
+# INPUT | TEXT INPUT
+@onready var input_mixdown = $Input/Input_Mixdown
+@onready var input_vocal = $Input/Input_Vocal
+@onready var input_instrumental = $Input/Input_Instrumental
+
+# BUTTTONS
+@onready var button_record = $Buttons/Button_Record
+@onready var button_play = $Buttons/Button_Play
+#@onready var button_save_mixdown = $Buttons/Button_SaveMixdown
+#@onready var button_save_vocals = $Buttons/Button_SaveVocals
+#@onready var button_import_instrumental = $Buttons/Button_ImportInstrumental
 
 
 
+# # # # # # # FUNCTIONS # # # # # # # #
+
+# RETURN FUNCTIONS
 func secToTime(sec):
-	var tTimeDict = {
-		"MIN" : 0,
-		"SEC" : 0
-	}
+	var temp_time_dictionary = {"MIN" : 0,"SEC" : 0} # INIT TEMP TIME DICTIONARY VALUE 
 	sec = roundf(sec)
 	if sec > 59:
-		tTimeDict["MIN"] =  round(sec/60)
-		tTimeDict["SEC"] = fmod(sec, 60.0)
+		temp_time_dictionary["MIN"] = round(sec/60) # HOW DO I MAKE THIS ALWAYS ROUND DOWN
+		temp_time_dictionary["SEC"] = fmod(sec, 60.0)
 	else:
-		tTimeDict["SEC"] = fmod(sec, 60.0)
-	return tTimeDict 
+		temp_time_dictionary["SEC"] = fmod(sec, 60.0)
+	return temp_time_dictionary 
 
+# VOID FUNCTIONS
 func updateTime():
-	runTimeDict = secToTime($AudioStreamInstrumental.stream.get_length()) 
-	curTimeDict = secToTime(current_playtime)
 	
-	var run_time_text = " / " + str(int(runTimeDict["MIN"])) + ":" + str(int(runTimeDict["SEC"])) 
-	var cur_time_text = str(int(curTimeDict["MIN"])) + ":" + str(int(curTimeDict["SEC"])) 
+	if asp_instrumental.stream.get_length() != null:
+		run_time_dictionary = secToTime(asp_instrumental.stream.get_length()) 
+		current_time_dictionary = secToTime(current_playtime)
+	else:
+		pass
+	
+	var run_time_text = " / " + str(int(run_time_dictionary["MIN"])) + ":" + str(int(run_time_dictionary["SEC"])) 
+	var cur_time_text = str(int(current_time_dictionary["MIN"])) + ":" + str(int(current_time_dictionary["SEC"])) 
 
-	$RunTimeLabel.text = run_time_text
-	$CurTimeLabel.text = cur_time_text
-
-func _ready():
-	var index = AudioServer.get_bus_index("Record")
-	effect = AudioServer.get_bus_effect(index, 0)
+	label_run_time.text = run_time_text
+	label_current_time.text = cur_time_text
 func audioStop():
-	$AudioStreamInstrumental.stop()
-	$AudioStreamPlayer.stop()
+	asp_instrumental.stop()
+	asp_vocal.stop()
 func updateRefresh(_state):
 	updateTime()
 	
 	match _state:
 		"RECORDING":
-			$RecordButton.text = "Stop"
+			button_record.text = "Stop"
 			state = "RECORDING"
 		
 		"STOPPED":
-			$RecordButton.text = "Record"
-			$PlayButton.text = "Play"
+			button_record.text = "Record"
+			button_play.text = "Play"
 			state = "STOPPED"
 		"PLAYING":
-			$PlayButton.text = "Stop"
+			button_play.text = "Stop"
 			state = "PLAYING"			
 		_:
 			pass
 			
-	$StateLabel.text = state
+	label_state.text = state
 func audioPlay(pos):
-	
-	
 	match pos:
 		0:
-			$AudioStreamPlayer.seek(0.0)
-			$AudioStreamInstrumental.seek(0.0)
-			$AudioStreamPlayer.play()
-			$AudioStreamInstrumental.play()	
+			asp_vocal.seek(0.0)
+			asp_instrumental.seek(0.0)
+			asp_vocal.play()
+			asp_instrumental.play()	
 		
 		1:
 			audioStop()
-			$AudioStreamInstrumental.seek(0.0)
-			$AudioStreamInstrumental.play()				
+			asp_instrumental.seek(0.0)
+			asp_instrumental.play()				
 		_:
-			$AudioStreamPlayer.play()
-			$AudioStreamInstrumental.play()			
+			asp_vocal.play()
+			asp_instrumental.play()			
 
+# MAIN FUNCTIONS
+func _ready():
+	var index = AudioServer.get_bus_index("Record")
+	effect = AudioServer.get_bus_effect(index, 0)
 func _process(delta):
-	current_playtime = $AudioStreamInstrumental.get_playback_position()	
+	current_playtime = asp_instrumental.get_playback_position()	
 	updateTime()
-	
-func _on_play_button_pressed():
-	if $AudioStreamInstrumental.playing:
-		updateRefresh("STOPPED")
-		audioStop()
-	else :
-		$AudioStreamPlayer.stream = recording
-		updateRefresh("PLAYING")
-		audioPlay(0)
-func _on_record_button_pressed():
+
+# 	CONNECTION FUNCTIONS
+#		CF		SLIDERS
+func _on_slider_instrumental_value_changed(value):
+	asp_instrumental.volume_db = value
+func _on_slider_vocals_value_changed(value):
+	asp_vocal.volume_db = value
+func _on_slider_mixdown_value_changed(value):
+	asp_mixdown.volume_db = value
+#		CF		BUTTONS 	| MAIN
+func _on_button_record_pressed():
 	recording = null
 	if effect.is_recording_active(): # IF RECORDING AND PRESSED
-		
 		updateRefresh("STOPPED") # CHANGING LABELS AND STATE
 		recording = effect.get_recording() # STORING RECORDING
 		effect.set_recording_active(false) # TURN OFF RECORDING
@@ -119,14 +136,25 @@ func _on_record_button_pressed():
 		updateRefresh("RECORDING") # CHANGE LABELS AND STATE
 		effect.set_recording_active(true) # TURN ON RECORDING
 		audioPlay(1) # PLAY AUDIO STREAMS
-	pass		
-func _on_vox_v_slider_value_changed(value):
-	$AudioStreamPlayer.volume_db = value
-func _on_instrumental_v_slider_value_changed(value):
-	$AudioStreamInstrumental.volume_db = value
+	pass	
+func _on_button_play_pressed():
+	if asp_instrumental.playing:
+		updateRefresh("STOPPED")
+		audioStop()
+	else :
+		asp_vocal.stream = recording
+		updateRefresh("PLAYING")
+		audioPlay(0)
+#		CF		BUTTONS 	| SAVE / LOAD
+func _on_button_save_mixdown_pressed():
+	pass # Replace with function body.
+func _on_button_save_vocals_pressed():
+	if(recording != null): 
+		recording
+func _on_button_import_instrumental_pressed():
+	pass # Replace with function body.
 
 
-func _on_save_button_pressed():
-	#var save_path = 
-	recording.save_to_wav()
-	pass
+### TEST
+func test():
+	AudioStream.new()

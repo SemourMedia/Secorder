@@ -1,7 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://4n00xkrlcywr"]
+[gd_scene load_steps=6 format=3 uid="uid://du00cu3l7vjba"]
 
 [ext_resource type="Script" path="res://control.gd" id="1_jsc5u"]
-[ext_resource type="AudioStream" uid="uid://bw87l8mq577by" path="res://audio/instrumental/30Minutes-4.mp3" id="2_1u28j"]
+[ext_resource type="AudioStream" uid="uid://bmohpwcdhs1nn" path="res://audio/instrumental/drezz.mp3" id="2_mgg5y"]
 
 [sub_resource type="AudioStreamMicrophone" id="AudioStreamMicrophone_pjmxy"]
 
@@ -18,39 +18,55 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_jsc5u")
 
-[node name="RecordButton" type="Button" parent="."]
-layout_mode = 0
-offset_left = 364.0
-offset_top = 137.0
-offset_right = 738.0
-offset_bottom = 260.0
-toggle_mode = true
-text = "Record
-"
+[node name="Audio" type="Node" parent="."]
 
-[node name="PlayButton" type="Button" parent="."]
-layout_mode = 0
-offset_left = 367.0
-offset_top = 327.0
-offset_right = 741.0
-offset_bottom = 450.0
-text = "Play"
-
-[node name="AudioStreamRecord" type="AudioStreamPlayer" parent="."]
+[node name="ASP_Record" type="AudioStreamPlayer" parent="Audio"]
 stream = SubResource("AudioStreamMicrophone_pjmxy")
 autoplay = true
 bus = &"Record"
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+[node name="ASP_Vocal" type="AudioStreamPlayer" parent="Audio"]
 mix_target = 2
 bus = &"Vox"
 
-[node name="AudioStreamInstrumental" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("2_1u28j")
+[node name="ASP_Instrumental" type="AudioStreamPlayer" parent="Audio"]
+stream = ExtResource("2_mgg5y")
 bus = &"Instrumental"
 
-[node name="InstrumentalVSlider" type="VSlider" parent="."]
-layout_mode = 0
+[node name="ASP_Mixdown" type="AudioStreamPlayer" parent="Audio"]
+
+[node name="Labels" type="Node" parent="."]
+
+[node name="Label_State" type="Label" parent="Labels"]
+offset_left = 962.0
+offset_top = 4.0
+offset_right = 1145.0
+offset_bottom = 44.0
+theme_override_font_sizes/font_size = 27
+text = "STOPPED"
+horizontal_alignment = 2
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Label_RunTime" type="Label" parent="Labels"]
+offset_left = 546.0
+offset_top = 565.0
+offset_right = 690.0
+offset_bottom = 648.0
+text = "0:00"
+metadata/_edit_use_anchors_ = true
+
+[node name="Label_CurrentTime" type="Label" parent="Labels"]
+offset_left = 512.0
+offset_top = 565.0
+offset_right = 656.0
+offset_bottom = 648.0
+text = "0:00"
+metadata/_edit_use_anchors_ = true
+
+[node name="Sliders" type="Node" parent="."]
+
+[node name="Slider_Instrumental" type="VSlider" parent="Sliders"]
 offset_left = 65.0
 offset_top = 73.0
 offset_right = 86.0
@@ -61,8 +77,7 @@ value = -12.0
 rounded = true
 ticks_on_borders = true
 
-[node name="VoxVSlider" type="VSlider" parent="."]
-layout_mode = 0
+[node name="Slider_Vocals" type="VSlider" parent="Sliders"]
 offset_left = 109.0
 offset_top = 74.0
 offset_right = 130.0
@@ -73,106 +88,88 @@ value = -12.0
 rounded = true
 ticks_on_borders = true
 
-[node name="StateLabel" type="Label" parent="."]
-layout_mode = 0
-offset_left = 962.0
-offset_top = 4.0
-offset_right = 1145.0
-offset_bottom = 44.0
-theme_override_font_sizes/font_size = 27
-text = "STOPPED"
-horizontal_alignment = 2
-vertical_alignment = 1
+[node name="Slider_Mixdown" type="VSlider" parent="Sliders"]
+offset_left = 148.0
+offset_top = 77.0
+offset_right = 169.0
+offset_bottom = 318.0
+min_value = -60.0
+max_value = 2.0
+value = -12.0
+rounded = true
+ticks_on_borders = true
 
-[node name="RunTimeLabel" type="Label" parent="."]
-layout_mode = 0
-offset_left = 546.0
-offset_top = 565.0
-offset_right = 690.0
-offset_bottom = 648.0
-text = "0:00"
+[node name="Buttons" type="Node" parent="."]
 
-[node name="CurTimeLabel" type="Label" parent="."]
-layout_mode = 0
-offset_left = 512.0
-offset_top = 565.0
-offset_right = 656.0
-offset_bottom = 648.0
-text = "0:00"
+[node name="Button_Record" type="Button" parent="Buttons"]
+offset_left = 364.0
+offset_top = 137.0
+offset_right = 738.0
+offset_bottom = 260.0
+toggle_mode = true
+text = "Record
+"
 
-[node name="SAVEANDLOAD" type="Node" parent="."]
+[node name="Button_Play" type="Button" parent="Buttons"]
+offset_left = 367.0
+offset_top = 327.0
+offset_right = 741.0
+offset_bottom = 450.0
+text = "Play"
 
-[node name="MixdownSave" type="Control" parent="SAVEANDLOAD"]
-visible = false
-layout_mode = 3
-anchors_preset = 0
-offset_left = 801.0
+[node name="Button_SaveMixdown" type="Button" parent="Buttons"]
+offset_left = 1101.0
 offset_top = 495.0
-offset_right = 1144.0
-offset_bottom = 535.0
-
-[node name="MixdownPathText" type="TextEdit" parent="SAVEANDLOAD/MixdownSave"]
-layout_mode = 2
-offset_right = 288.0
-offset_bottom = 31.0
-text = "1000"
-placeholder_text = "1000"
-
-[node name="MixdownButton" type="Button" parent="SAVEANDLOAD/MixdownSave"]
-layout_mode = 2
-offset_left = 300.0
-offset_right = 344.0
-offset_bottom = 31.0
+offset_right = 1145.0
+offset_bottom = 526.0
 theme = SubResource("Theme_of01n")
 text = "Save"
 
-[node name="VocalSave" type="Control" parent="SAVEANDLOAD"]
-layout_mode = 3
-anchors_preset = 0
-offset_left = 801.0
+[node name="Button_SaveVocals" type="Button" parent="Buttons"]
+offset_left = 1101.0
 offset_top = 541.0
-offset_right = 1144.0
-offset_bottom = 581.0
-
-[node name="VocalSavePath" type="TextEdit" parent="SAVEANDLOAD/VocalSave"]
-layout_mode = 2
-offset_right = 288.0
-offset_bottom = 31.0
-
-[node name="VocalSaveButton" type="Button" parent="SAVEANDLOAD/VocalSave"]
-layout_mode = 2
-offset_left = 300.0
-offset_right = 344.0
-offset_bottom = 31.0
+offset_right = 1145.0
+offset_bottom = 572.0
 theme = SubResource("Theme_of01n")
 text = "Save"
 
-[node name="InstrumentalLoad" type="Control" parent="SAVEANDLOAD"]
-visible = false
-layout_mode = 3
-anchors_preset = 0
-offset_left = 803.0
+[node name="Button_ImportInstrumental" type="Button" parent="Buttons"]
+offset_left = 1103.0
 offset_top = 451.0
-offset_right = 1146.0
-offset_bottom = 491.0
-
-[node name="TextEdit" type="TextEdit" parent="SAVEANDLOAD/InstrumentalLoad"]
-layout_mode = 2
-offset_right = 288.0
-offset_bottom = 31.0
-text = "1000"
-placeholder_text = "1000"
-
-[node name="SaveButton" type="Button" parent="SAVEANDLOAD/InstrumentalLoad"]
-layout_mode = 2
-offset_left = 300.0
-offset_right = 344.0
-offset_bottom = 31.0
+offset_right = 1149.0
+offset_bottom = 482.0
 theme = SubResource("Theme_x8kph")
 text = "Load"
 
-[connection signal="pressed" from="RecordButton" to="." method="_on_record_button_pressed"]
-[connection signal="toggled" from="RecordButton" to="." method="_on_record_button_toggled"]
-[connection signal="pressed" from="PlayButton" to="." method="_on_play_button_pressed"]
-[connection signal="value_changed" from="InstrumentalVSlider" to="." method="_on_instrumental_v_slider_value_changed"]
-[connection signal="value_changed" from="VoxVSlider" to="." method="_on_vox_v_slider_value_changed"]
+[node name="Input" type="Node" parent="."]
+
+[node name="Input_Mixdown" type="TextEdit" parent="Input"]
+offset_left = 801.0
+offset_top = 495.0
+offset_right = 1089.0
+offset_bottom = 526.0
+text = "1000"
+placeholder_text = "1000"
+
+[node name="Input_Vocal" type="TextEdit" parent="Input"]
+offset_left = 801.0
+offset_top = 541.0
+offset_right = 1089.0
+offset_bottom = 572.0
+
+[node name="Input_Instrumental" type="TextEdit" parent="Input"]
+offset_left = 803.0
+offset_top = 451.0
+offset_right = 1091.0
+offset_bottom = 482.0
+text = "1000"
+placeholder_text = "1000"
+
+[connection signal="value_changed" from="Sliders/Slider_Instrumental" to="." method="_on_slider_instrumental_value_changed"]
+[connection signal="value_changed" from="Sliders/Slider_Vocals" to="." method="_on_slider_vocals_value_changed"]
+[connection signal="value_changed" from="Sliders/Slider_Mixdown" to="." method="_on_slider_mixdown_value_changed"]
+[connection signal="pressed" from="Buttons/Button_Record" to="." method="_on_button_record_pressed"]
+[connection signal="pressed" from="Buttons/Button_Play" to="." method="_on_button_play_pressed"]
+[connection signal="pressed" from="Buttons/Button_SaveMixdown" to="." method="_on_button_save_mixdown_pressed"]
+[connection signal="pressed" from="Buttons/Button_SaveVocals" to="." method="_on_button_save_vocals_pressed"]
+[connection signal="pressed" from="Buttons/Button_ImportInstrumental" to="." method="_on_button_import_instrumental_pressed"]
