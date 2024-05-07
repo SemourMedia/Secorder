@@ -1,0 +1,114 @@
+[gd_scene load_steps=5 format=3 uid="uid://4n00xkrlcywr"]
+
+[ext_resource type="Script" path="res://control.gd" id="1_jsc5u"]
+[ext_resource type="AudioStream" uid="uid://bw87l8mq577by" path="res://audio/instrumental/30Minutes-4.mp3" id="2_1u28j"]
+[ext_resource type="PackedScene" uid="uid://bgs3fpj05k3a5" path="res://scenes/save_container.tscn" id="3_2sbaf"]
+
+[sub_resource type="AudioStreamMicrophone" id="AudioStreamMicrophone_pjmxy"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_jsc5u")
+
+[node name="RecordButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 364.0
+offset_top = 137.0
+offset_right = 738.0
+offset_bottom = 260.0
+toggle_mode = true
+text = "Record
+"
+
+[node name="PlayButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 367.0
+offset_top = 327.0
+offset_right = 741.0
+offset_bottom = 450.0
+text = "Play"
+
+[node name="AudioStreamRecord" type="AudioStreamPlayer" parent="."]
+stream = SubResource("AudioStreamMicrophone_pjmxy")
+autoplay = true
+bus = &"Record"
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+mix_target = 2
+bus = &"Vox"
+
+[node name="AudioStreamInstrumental" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_1u28j")
+bus = &"Instrumental"
+
+[node name="InstrumentalVSlider" type="VSlider" parent="."]
+layout_mode = 0
+offset_left = 65.0
+offset_top = 73.0
+offset_right = 86.0
+offset_bottom = 314.0
+min_value = -60.0
+max_value = 2.0
+value = -12.0
+rounded = true
+ticks_on_borders = true
+
+[node name="VoxVSlider" type="VSlider" parent="."]
+layout_mode = 0
+offset_left = 109.0
+offset_top = 74.0
+offset_right = 130.0
+offset_bottom = 315.0
+min_value = -60.0
+max_value = 2.0
+value = -12.0
+rounded = true
+ticks_on_borders = true
+
+[node name="StateLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 962.0
+offset_top = 4.0
+offset_right = 1145.0
+offset_bottom = 44.0
+theme_override_font_sizes/font_size = 27
+text = "STOPPED"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="RunTimeLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 546.0
+offset_top = 565.0
+offset_right = 690.0
+offset_bottom = 648.0
+text = "0:00"
+
+[node name="CurTimeLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 512.0
+offset_top = 565.0
+offset_right = 656.0
+offset_bottom = 648.0
+text = "0:00"
+
+[node name="MixdownSave" parent="." instance=ExtResource("3_2sbaf")]
+
+[node name="VocalSave" parent="." instance=ExtResource("3_2sbaf")]
+
+[node name="InstrumentalLoad" parent="." instance=ExtResource("3_2sbaf")]
+offset_left = 1604.0
+offset_top = 1202.0
+offset_right = 1947.0
+offset_bottom = 1242.0
+
+[connection signal="pressed" from="RecordButton" to="." method="_on_record_button_pressed"]
+[connection signal="toggled" from="RecordButton" to="." method="_on_record_button_toggled"]
+[connection signal="pressed" from="PlayButton" to="." method="_on_play_button_pressed"]
+[connection signal="value_changed" from="InstrumentalVSlider" to="." method="_on_instrumental_v_slider_value_changed"]
+[connection signal="value_changed" from="VoxVSlider" to="." method="_on_vox_v_slider_value_changed"]

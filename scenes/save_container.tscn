@@ -1,0 +1,26 @@
+[gd_scene load_steps=2 format=3 uid="uid://bgs3fpj05k3a5"]
+
+[sub_resource type="Theme" id="Theme_of01n"]
+
+[node name="SaveContainer" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 802.0
+offset_top = 601.0
+offset_right = 1145.0
+offset_bottom = 641.0
+
+[node name="TextEdit" type="TextEdit" parent="."]
+layout_mode = 2
+offset_right = 288.0
+offset_bottom = 31.0
+text = "1000"
+placeholder_text = "1000"
+
+[node name="SaveButton" type="Button" parent="."]
+layout_mode = 2
+offset_left = 300.0
+offset_right = 344.0
+offset_bottom = 31.0
+theme = SubResource("Theme_of01n")
+text = "Save"
